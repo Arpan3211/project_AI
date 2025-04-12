@@ -100,10 +100,24 @@ async function login(email, password, form) {
         localStorage.setItem('token', data.access_token);
 
         // Get user profile
-        await fetchAndStoreUserProfile();
+        const userResponse = await fetch(`${API_URL}/auth/me`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${data.access_token}`,
+            },
+        });
+
+        if (!userResponse.ok) {
+            throw new Error('Failed to fetch user profile');
+        }
+
+        const userData = await userResponse.json();
+
+        // Save user data to localStorage
+        localStorage.setItem('user', JSON.stringify(userData));
 
         // Redirect to chat page
-        window.location.href = 'index.html';
+        window.location.href = 'chat.html';
     } catch (error) {
         console.error('Login error:', error);
         hideLoading(form, 'Login');

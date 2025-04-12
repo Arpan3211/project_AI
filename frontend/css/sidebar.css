@@ -11,14 +11,17 @@
     position: relative;
     overflow-x: hidden;
     border-radius: var(--border-radius);
-    backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
     box-shadow: var(--glass-shadow);
 }
 
 .sidebar.collapsed {
     width: 70px;
     padding: 20px 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .sidebar-header {
@@ -46,8 +49,8 @@
     top: 0;
     z-index: 10;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
 }
 
 .sidebar-toggle:hover {
@@ -80,8 +83,14 @@
     box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
 }
 
+.new-chat-btn i {
+    margin-right: 8px;
+    font-size: 14px;
+}
+
+/* Remove hover effect as requested */
 .new-chat-btn:hover {
-    background-color: var(--secondary-color);
+    /* No hover effect */
 }
 
 .sidebar.collapsed .new-chat-btn {
@@ -90,16 +99,22 @@
     padding: 0;
     border-radius: 50%;
     margin: 0 auto 20px;
-}
-
-.sidebar.collapsed .new-chat-btn::after {
-    content: '+';
-    font-size: 20px;
-    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .sidebar.collapsed .new-chat-btn span {
     display: none;
+}
+
+.sidebar.collapsed .new-chat-btn i {
+    margin: 0;
+    font-size: 16px;
+}
+
+.sidebar.collapsed .sidebar-footer {
+    width: 100%;
 }
 
 .sidebar-nav {
@@ -154,6 +169,50 @@
     transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
-.sidebar.collapsed .nav-item {
+.sidebar.collapsed .nav-item,
+.sidebar.collapsed .conversations-list {
+    display: none;
+}
+
+/* Collapsed sidebar footer styling */
+.sidebar.collapsed .sidebar-footer {
+    position: absolute;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.sidebar.collapsed .user-info {
+    margin-bottom: 0;
+}
+
+.sidebar.collapsed .user-name {
+    display: none;
+}
+
+.sidebar.collapsed .user-avatar {
+    margin: 0;
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+}
+
+.sidebar.collapsed .btn-logout {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0;
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.sidebar.collapsed .btn-logout span {
     display: none;
 }

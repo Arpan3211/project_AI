@@ -3,12 +3,12 @@ from sqlalchemy.orm import Session
 # Handle imports for both direct and package execution
 try:
     from app.db.database import Base, engine
-    from app.models import User
+    from app.models import User, Conversation, Message
     from app.schemas.user import UserCreate
     from app.services.auth import create_user
 except ImportError:
     from backend.app.db.database import Base, engine
-    from backend.app.models import User
+    from backend.app.models import User, Conversation, Message
     from backend.app.schemas.user import UserCreate
     from backend.app.services.auth import create_user
 

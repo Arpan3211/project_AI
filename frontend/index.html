@@ -4,72 +4,59 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Assistant</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/sidebar.css">
-    <link rel="stylesheet" href="css/chat.css">
-    <link rel="stylesheet" href="css/auth.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta http-equiv="refresh" content="0;url=chat.html">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 50%, #ede9fe 100%);
+        }
+        .redirect-message {
+            text-align: center;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #3b82f6;
+        }
+        p {
+            margin-top: 10px;
+            color: #4b5563;
+        }
+        a {
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Sidebar -->
-        <div class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <!-- Logo removed as requested -->
-                <button type="button" id="sidebar-toggle" class="sidebar-toggle" title="Toggle sidebar">
-                    <i class="fas fa-angle-left"></i>
-                </button>
-            </div>
-            <button type="button" class="new-chat-btn"><span>+ New Chat</span></button>
-            <nav class="sidebar-nav">
-                <ul>
-                    <!-- Monitoring feature removed as requested -->
-                    <li class="nav-item">
-                        <i class="fas fa-history"></i>
-                        <span>History</span>
-                        <i class="fas fa-chevron-down"></i>
-                    </li>
-                </ul>
-            </nav>
-        </div>
-
-        <!-- Main Chat Area -->
-        <div class="chat-container">
-            <div class="user-profile" id="user-profile">
-                <div class="user-badge" id="login-btn">Login</div>
-            </div>
-            <div class="chat-content">
-                <div class="welcome-message">
-                    <p>Hey, <span>Welcome to</span> <span class="highlight">AI Assistant</span></p>
-                    <h1>How Can I Help?</h1>
-                </div>
-                <div class="chat-messages" id="chat-messages">
-                    <!-- Messages will be added here dynamically -->
-                </div>
-                <div class="chat-input-container">
-                    <div class="chat-input-wrapper">
-                        <!-- Voice button removed as requested -->
-                        <input type="text" id="chat-input" placeholder="Enter the prompt">
-                        <button type="button" class="send-btn" id="send-btn" title="Send message">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="redirect-message">
+        <h1>Redirecting to Chat...</h1>
+        <p>If you are not redirected automatically, <a href="chat.html">click here</a>.</p>
     </div>
 
-    <!-- Chat button (mobile) -->
-    <div class="chat-button">
-        <i class="fas fa-comment"></i>
-    </div>
-
-    <!-- Modals removed - using separate pages for login and registration -->
-
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="js/services/api.js"></script>
-    <script src="js/components/chat.js"></script>
-    <script src="js/services/auth.js"></script>
-    <script src="js/main.js"></script>
+    <script>
+        // Check if user is logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                // If not logged in, redirect to login page
+                window.location.href = 'login.html';
+            } else {
+                // If logged in, redirect to chat page
+                window.location.href = 'chat.html';
+            }
+        });
+    </script>
 </body>
 </html>
