@@ -1,0 +1,159 @@
+/* Sidebar Styles */
+.sidebar {
+    width: 230px;
+    height: 100%;
+    background-color: var(--sidebar-bg);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    border-right: var(--glass-border);
+    transition: width 0.3s ease, padding 0.3s ease;
+    position: relative;
+    overflow-x: hidden;
+    border-radius: var(--border-radius);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: var(--glass-shadow);
+}
+
+.sidebar.collapsed {
+    width: 70px;
+    padding: 20px 15px;
+}
+
+.sidebar-header {
+    position: relative;
+    height: 30px;
+    margin-bottom: 20px;
+}
+
+.sidebar-toggle {
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: var(--text-color);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 8px;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+    position: absolute;
+    right: -12px;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+.sidebar-toggle:hover {
+    background-color: #e6e6e6;
+}
+
+.sidebar.collapsed .sidebar-toggle {
+    right: -12px;
+    transform: rotate(180deg);
+}
+
+/* Logo styles removed as requested */
+
+.new-chat-btn {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-weight: 500;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    width: 100%;
+    box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+}
+
+.new-chat-btn:hover {
+    background-color: var(--secondary-color);
+}
+
+.sidebar.collapsed .new-chat-btn {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: 50%;
+    margin: 0 auto 20px;
+}
+
+.sidebar.collapsed .new-chat-btn::after {
+    content: '+';
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.sidebar.collapsed .new-chat-btn span {
+    display: none;
+}
+
+.sidebar-nav {
+    flex: 1;
+}
+
+.sidebar-nav ul {
+    list-style: none;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 10px;
+    border-radius: var(--border-radius);
+    margin-bottom: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, padding 0.3s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    background-color: rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.nav-item:hover {
+    background-color: rgba(59, 130, 246, 0.2);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.nav-item.active {
+    background-color: rgba(59, 130, 246, 0.2);
+    color: var(--primary-color);
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.nav-item i {
+    margin-right: 10px;
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+    transition: margin 0.3s ease;
+}
+
+.nav-item span {
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.nav-item .fa-chevron-down {
+    margin-left: auto;
+    font-size: 12px;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.sidebar.collapsed .nav-item {
+    display: none;
+}
