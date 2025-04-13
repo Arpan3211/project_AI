@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Dict
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 import random
@@ -9,11 +9,13 @@ try:
     from app.models.message import Message
     from app.schemas.conversation import ConversationCreate
     from app.schemas.message import MessageCreate
+    from app.services.hr_analytics import process_hr_analytics_query
 except ImportError:
     from backend.app.models.conversation import Conversation
     from backend.app.models.message import Message
     from backend.app.schemas.conversation import ConversationCreate
     from backend.app.schemas.message import MessageCreate
+    from backend.app.services.hr_analytics import process_hr_analytics_query
 
 # Get conversation by conversation_id
 def get_conversation_by_id_str(db: Session, conversation_id: str) -> Optional[Conversation]:
@@ -87,20 +89,52 @@ def create_message(db: Session, message_in: MessageCreate, conversation_id_str: 
     db.refresh(db_message)
     return db_message
 
-# Generate AI response (demo version)
-def generate_ai_response(prompt: str) -> str:
-    # This is a simple demo response generator
-    # In a real application, this would call an AI model API
+# Get conversation history for a conversation
+def get_conversation_history(db: Session, conversation_id: str, max_messages: int = 10) -> List[Dict[str, str]]:
+    """Get conversation history in a format suitable for the HR Analytics chatbot"""
+    # Get the conversation
+    conversation = get_conversation_by_id_str(db, conversation_id)
+    if not conversation:
+        return []
 
-    responses = [
-        f"I understand you're saying: '{prompt}'. That's an interesting point.",
-        f"Thanks for sharing your thoughts on '{prompt}'. I'd like to learn more.",
-        f"Regarding '{prompt}', I think there are several perspectives to consider.",
-        f"'{prompt}' is a fascinating topic. Let me share some insights.",
-        f"I've processed your message about '{prompt}' and here's my response.",
-        f"Your question about '{prompt}' is important. Here's what I think.",
-        f"I've analyzed your input on '{prompt}' and have some thoughts to share.",
-        f"Based on your message about '{prompt}', I can provide the following information."
-    ]
+    # Get messages for this conversation
+    messages = db.query(Message).filter(Message.conversation_id == conversation.id).order_by(Message.created_at).limit(max_messages).all()
 
-    return random.choice(responses)
+    # Format messages for HR Analytics
+    history = []
+    for msg in messages:
+        history.append({
+            "role": msg.role,  # 'user' or 'assistant'
+            "content": msg.content
+        })
+
+    return history
+
+# Generate AI response using HR Analytics
+def generate_ai_response(prompt: str, conversation_history: List[Dict[str, str]] = None) -> str:
+    """Generate AI response using HR Analytics chatbot"""
+    try:
+        # Use HR Analytics to process the query
+        if conversation_history is None:
+            conversation_history = []
+
+        response = process_hr_analytics_query(prompt, conversation_history)
+
+        # Return the answer
+        if response and response.get("answer"):
+            return response.get("answer")
+
+        # Fallback to default responses if HR Analytics fails
+        raise Exception("HR Analytics processing failed")
+    except Exception as e:
+        print(f"Error generating AI response: {str(e)}")
+        # Fallback responses
+        responses = [
+            f"I understand you're asking about '{prompt}'. Let me analyze the HR data for you.",
+            f"Thanks for your HR analytics query on '{prompt}'. Here's what I found.",
+            f"Regarding '{prompt}', I'll check the HR database for insights.",
+            f"Your HR query about '{prompt}' is important. Let me process that for you.",
+            f"I'm analyzing your HR question about '{prompt}' and will provide the best information available."
+        ]
+
+        return random.choice(responses)

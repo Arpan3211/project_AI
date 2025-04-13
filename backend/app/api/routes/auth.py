@@ -45,7 +45,7 @@ def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
 ) -> Any:
     """
-    OAuth2 compatible token login, get an access token for future requests.
+    OAuth2 compatible token login, get an access token and user info.
     """
     user = authenticate_user(db, email=form_data.username, password=form_data.password)
     if not user:
@@ -63,6 +63,7 @@ def login(
     return {
         "access_token": access_token,
         "token_type": "bearer",
+        "user": user,
     }
 
 @router.get("/auth/me", response_model=User)

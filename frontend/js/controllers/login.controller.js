@@ -76,6 +76,7 @@ class LoginController {
         }
 
         try {
+            debugger
             // Show loading state
             this.loginForm.classList.add('loading');
 

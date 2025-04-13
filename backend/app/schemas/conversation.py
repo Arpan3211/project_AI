@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Optional, Any
+from typing import List, Optional, Dict, Any
 from datetime import datetime
 
 # Shared properties
@@ -18,12 +18,24 @@ class Conversation(ConversationBase):
     created_at: datetime
     updated_at: Optional[datetime] = None
 
-    class Config:
-        orm_mode = True
+    # Support both Pydantic v1 and v2
+    try:
+        # Pydantic v2
+        model_config = {"from_attributes": True}
+    except:
+        # Pydantic v1
+        class Config:
+            orm_mode = True
 
 # Properties to return via API with messages
 class ConversationWithMessages(Conversation):
-    messages: List[Any] = []
+    messages: List[Dict[str, Any]] = []
 
-    class Config:
-        orm_mode = True
+    # Support both Pydantic v1 and v2
+    try:
+        # Pydantic v2
+        model_config = {"from_attributes": True}
+    except:
+        # Pydantic v1
+        class Config:
+            orm_mode = True

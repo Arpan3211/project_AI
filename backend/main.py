@@ -2,10 +2,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 # Import the routers
 try:
-    from app.api.routes import auth, chat
+    from app.api.routes import auth, chat, hr_analytics
 except ImportError:
     # Handle relative imports when running directly
-    from backend.app.api.routes import auth, chat
+    from backend.app.api.routes import auth, chat, hr_analytics
 # Import settings
 try:
     from app.core.config import settings
@@ -32,6 +32,7 @@ app.add_middleware(
 # Include routers
 app.include_router(auth.router, prefix="/api", tags=["Authentication"])
 app.include_router(chat.router, prefix="/api", tags=["Chat"])
+app.include_router(hr_analytics.router, prefix="/api", tags=["HR Analytics"])
 
 @app.get("/")
 async def root():

@@ -165,6 +165,7 @@ class ChatController {
 
     // Load a specific conversation
     async loadConversation(conversationId) {
+
         try {
             const conversation = await chatApi.getConversation(conversationId);
             this.currentConversationId = conversation.conversation_id;
@@ -180,7 +181,7 @@ class ChatController {
             const conversationItems = document.querySelectorAll('.conversation-item');
             conversationItems.forEach(item => {
                 item.classList.remove('active');
-                if (item.dataset.id === id.toString()) {
+                if (item.dataset.id === this.currentConversationId) {
                     item.classList.add('active');
                 }
             });
@@ -299,6 +300,8 @@ class ChatController {
     // Handle sending a message
     async handleSendMessage(e) {
         e.preventDefault();
+        e.stopPropagation();
+
 
         if (!this.chatInput) return;
 

@@ -10,7 +10,8 @@ try:
     from app.services.chat import (
         get_user_conversations, create_conversation, get_conversation_by_id,
         get_conversation_messages, create_message, generate_ai_response,
-        update_conversation_title, delete_conversation, get_conversation_by_id_str
+        update_conversation_title, delete_conversation, get_conversation_by_id_str,
+        get_conversation_history
     )
     from app.schemas.conversation import Conversation, ConversationCreate, ConversationWithMessages
     from app.schemas.message import Message, MessageCreate
@@ -21,7 +22,8 @@ except ImportError:
     from backend.app.services.chat import (
         get_user_conversations, create_conversation, get_conversation_by_id,
         get_conversation_messages, create_message, generate_ai_response,
-        update_conversation_title, delete_conversation, get_conversation_by_id_str
+        update_conversation_title, delete_conversation, get_conversation_by_id_str,
+        get_conversation_history
     )
     from backend.app.schemas.conversation import Conversation, ConversationCreate, ConversationWithMessages
     from backend.app.schemas.message import Message, MessageCreate
@@ -76,6 +78,18 @@ def get_conversation(
     # Get messages for this conversation
     messages = get_conversation_messages(db, conversation.conversation_id)
 
+    # Convert Message objects to dictionaries
+    message_dicts = []
+    for msg in messages:
+        message_dicts.append({
+            "id": msg.id,
+            "message_id": msg.message_id,
+            "conversation_id": msg.conversation_id,
+            "role": msg.role,
+            "content": msg.content,
+            "created_at": msg.created_at
+        })
+
     # Create a ConversationWithMessages object
     result = ConversationWithMessages(
         id=conversation.id,
@@ -84,7 +98,7 @@ def get_conversation(
         title=conversation.title,
         created_at=conversation.created_at,
         updated_at=conversation.updated_at,
-        messages=messages
+        messages=message_dicts
     )
 
     return result
@@ -109,6 +123,18 @@ def get_conversation_by_id_str_route(
     # Get messages for this conversation
     messages = get_conversation_messages(db, conversation.conversation_id)
 
+    # Convert Message objects to dictionaries
+    message_dicts = []
+    for msg in messages:
+        message_dicts.append({
+            "id": msg.id,
+            "message_id": msg.message_id,
+            "conversation_id": msg.conversation_id,
+            "role": msg.role,
+            "content": msg.content,
+            "created_at": msg.created_at
+        })
+
     # Create a ConversationWithMessages object
     result = ConversationWithMessages(
         id=conversation.id,
@@ -117,7 +143,7 @@ def get_conversation_by_id_str_route(
         title=conversation.title,
         created_at=conversation.created_at,
         updated_at=conversation.updated_at,
-        messages=messages
+        messages=message_dicts
     )
 
     return result
@@ -250,8 +276,11 @@ def chat(
     # Save the user message
     user_message = create_message(db, message_in, conversation_id_str)
 
-    # Generate AI response
-    ai_response_text = generate_ai_response(message_in.content)
+    # Get conversation history for context
+    conversation_history = get_conversation_history(db, conversation_id_str)
+
+    # Generate AI response with conversation history
+    ai_response_text = generate_ai_response(message_in.content, conversation_history)
 
     # Create AI response message
     ai_message_in = MessageCreate(
