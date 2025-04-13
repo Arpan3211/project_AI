@@ -1,7 +1,7 @@
 // Authentication Service for Chat Page
 
-// API URL
-const API_URL = 'http://localhost:8000/api';
+// Get API URL from config
+const API_URL = window.appConfig.API_URL;
 
 // User authentication state
 let currentUser = null;
@@ -88,8 +88,11 @@ async function logout() {
             const response = await fetch(`${API_URL}/auth/logout`, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${token}`
-                }
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                mode: 'cors',
+                credentials: 'include'
             });
 
             if (!response.ok) {

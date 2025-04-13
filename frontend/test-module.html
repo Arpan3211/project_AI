@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ES Module Test</title>
+</head>
+<body>
+    <h1>ES Module Test</h1>
+    <div id="result">Testing...</div>
+
+    <script type="module">
+        import { testMessage } from './js/test-module.js';
+        
+        // Display the test message
+        document.getElementById('result').textContent = testMessage;
+        console.log('Main script loaded the module:', testMessage);
+    </script>
+</body>
+</html>

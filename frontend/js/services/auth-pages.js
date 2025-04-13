@@ -1,7 +1,7 @@
 // Authentication Service for Login and Register Pages
 
-// API URL
-const API_URL = 'http://localhost:8000/api';
+// Get API URL from config
+const API_URL = window.appConfig.API_URL;
 
 // Show loading spinner
 function showLoading(form) {

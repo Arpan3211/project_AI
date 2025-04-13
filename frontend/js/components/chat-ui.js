@@ -1,4 +1,6 @@
 // Chat UI Component
+// ChatAPI and logout are defined in their respective files
+
 document.addEventListener('DOMContentLoaded', function() {
     // Check if user is logged in
     const token = localStorage.getItem('token');
@@ -11,7 +13,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const chatMessages = document.getElementById('chat-messages');
     const chatForm = document.getElementById('chat-form');
     const chatInput = document.getElementById('chat-input');
-    const sendMessageBtn = document.getElementById('send-message-btn');
     const newChatBtn = document.getElementById('new-chat-btn');
     const sidebarToggle = document.getElementById('sidebar-toggle');
     const sidebar = document.querySelector('.sidebar');
@@ -73,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function loadConversations() {
         try {
-            conversations = await getConversations();
+            conversations = await ChatAPI.getConversations();
             renderConversations();
 
             // If there are conversations, load the first one
@@ -119,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function loadConversation(id) {
         try {
-            const conversation = await getConversation(id);
+            const conversation = await ChatAPI.getConversation(id);
             currentConversationId = conversation.id;
             conversationTitle.textContent = conversation.title;
 
@@ -216,7 +217,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
 
                 // Send message to API
-                const response = await sendMessage(message);
+                const response = await ChatAPI.sendMessage(message);
 
                 // Get the conversation ID from the response
                 if (response && response.length > 0) {
@@ -237,7 +238,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
 
                 // Send message to API with conversation ID
-                const response = await sendMessage(message, currentConversationId);
+                const response = await ChatAPI.sendMessage(message, currentConversationId);
 
                 // Append AI response
                 if (response && response.length > 0) {
@@ -254,9 +255,8 @@ document.addEventListener('DOMContentLoaded', function() {
         showWelcomeMessage();
     }
 
-    function handleLogout() {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+    async function handleLogout() {
+        await logout();
         window.location.href = 'login.html';
     }
 

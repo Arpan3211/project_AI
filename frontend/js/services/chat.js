@@ -1,8 +1,9 @@
 // Chat Service
-const API_URL = 'http://localhost:8000/api';
+// Get API URL from config
+const API_URL = window.appConfig.API_URL;
 
 // Get all conversations
-async function getConversations() {
+window.getConversations = async function() {
     try {
         const token = localStorage.getItem('token');
         if (!token) {
@@ -30,7 +31,7 @@ async function getConversations() {
 }
 
 // Get a specific conversation with messages
-async function getConversation(conversationId) {
+window.getConversation = async function(conversationId) {
     try {
         const token = localStorage.getItem('token');
         if (!token) {
@@ -58,7 +59,7 @@ async function getConversation(conversationId) {
 }
 
 // Create a new conversation
-async function createConversation(title = 'New Conversation') {
+window.createConversation = async function(title = 'New Conversation') {
     try {
         const token = localStorage.getItem('token');
         if (!token) {
@@ -87,7 +88,7 @@ async function createConversation(title = 'New Conversation') {
 }
 
 // Send a message and get AI response
-async function sendMessage(message, conversationId = null) {
+window.sendMessage = async function(message, conversationId = null) {
     try {
         const token = localStorage.getItem('token');
         if (!token) {
@@ -125,7 +126,7 @@ async function sendMessage(message, conversationId = null) {
 }
 
 // Delete a conversation
-async function deleteConversation(conversationId) {
+window.deleteConversation = async function(conversationId) {
     try {
         const token = localStorage.getItem('token');
         if (!token) {
@@ -153,7 +154,7 @@ async function deleteConversation(conversationId) {
 }
 
 // Update conversation title
-async function updateConversationTitle(conversationId, title) {
+window.updateConversationTitle = async function(conversationId, title) {
     try {
         const token = localStorage.getItem('token');
         if (!token) {

@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     API_PREFIX: str = "/api"
 
     # CORS settings
-    CORS_ORIGINS: List[str] = ["*"]
+    CORS_ORIGINS: List[str] = ["*", "http://localhost:8000", "http://localhost:3000", "file://", "null"]
 
     # Database settings
     DATABASE_URL: str = f"sqlite:///{BASE_DIR}/app/db/chat.db"

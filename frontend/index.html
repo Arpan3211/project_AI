@@ -46,14 +46,11 @@
     </div>
 
     <script>
-        // Check if user is logged in
         document.addEventListener('DOMContentLoaded', function() {
             const token = localStorage.getItem('token');
             if (!token) {
-                // If not logged in, redirect to login page
                 window.location.href = 'login.html';
             } else {
-                // If logged in, redirect to chat page
                 window.location.href = 'chat.html';
             }
         });

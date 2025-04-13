@@ -31,13 +31,11 @@
 }
 
 .sidebar-toggle {
-    background-color: rgba(255, 255, 255, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    color: var(--text-color);
+    background-color: transparent;
+    border: none;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 22px;
     padding: 8px;
-    border-radius: 50%;
     width: 24px;
     height: 24px;
     display: flex;
@@ -45,16 +43,11 @@
     justify-content: center;
     transition: transform 0.3s ease, background-color 0.3s ease;
     position: absolute;
-    right: -12px;
+    right: -22px;
     top: 0;
     z-index: 10;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     -webkit-backdrop-filter: blur(5px);
     backdrop-filter: blur(5px);
-}
-
-.sidebar-toggle:hover {
-    background-color: #e6e6e6;
 }
 
 .sidebar.collapsed .sidebar-toggle {
@@ -62,7 +55,6 @@
     transform: rotate(180deg);
 }
 
-/* Logo styles removed as requested */
 
 .new-chat-btn {
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
@@ -86,11 +78,6 @@
 .new-chat-btn i {
     margin-right: 8px;
     font-size: 14px;
-}
-
-/* Remove hover effect as requested */
-.new-chat-btn:hover {
-    /* No hover effect */
 }
 
 .sidebar.collapsed .new-chat-btn {
@@ -174,7 +161,6 @@
     display: none;
 }
 
-/* Collapsed sidebar footer styling */
 .sidebar.collapsed .sidebar-footer {
     position: absolute;
     bottom: 20px;
