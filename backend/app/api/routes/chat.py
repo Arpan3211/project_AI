@@ -1,6 +1,7 @@
 from typing import List, Any
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from pydantic import BaseModel
 
 # Handle imports for both direct and package execution
 try:
@@ -9,7 +10,7 @@ try:
     from app.services.chat import (
         get_user_conversations, create_conversation, get_conversation_by_id,
         get_conversation_messages, create_message, generate_ai_response,
-        update_conversation_title, delete_conversation, get_conversation_by_uuid
+        update_conversation_title, delete_conversation, get_conversation_by_id_str
     )
     from app.schemas.conversation import Conversation, ConversationCreate, ConversationWithMessages
     from app.schemas.message import Message, MessageCreate
@@ -20,7 +21,7 @@ except ImportError:
     from backend.app.services.chat import (
         get_user_conversations, create_conversation, get_conversation_by_id,
         get_conversation_messages, create_message, generate_ai_response,
-        update_conversation_title, delete_conversation, get_conversation_by_uuid
+        update_conversation_title, delete_conversation, get_conversation_by_id_str
     )
     from backend.app.schemas.conversation import Conversation, ConversationCreate, ConversationWithMessages
     from backend.app.schemas.message import Message, MessageCreate
@@ -73,12 +74,12 @@ def get_conversation(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not enough permissions")
 
     # Get messages for this conversation
-    messages = get_conversation_messages(db, conversation.id)
+    messages = get_conversation_messages(db, conversation.conversation_id)
 
     # Create a ConversationWithMessages object
     result = ConversationWithMessages(
         id=conversation.id,
-        uuid=conversation.uuid,
+        conversation_id=conversation.conversation_id,
         user_id=conversation.user_id,
         title=conversation.title,
         created_at=conversation.created_at,
@@ -88,17 +89,17 @@ def get_conversation(
 
     return result
 
-# Get a specific conversation by UUID with messages
-@router.get("/conversations/uuid/{conversation_uuid}", response_model=ConversationWithMessages)
-def get_conversation_by_uuid_route(
-    conversation_uuid: str,
+# Get a specific conversation by conversation_id with messages
+@router.get("/conversations/id/{conversation_id_str}", response_model=ConversationWithMessages)
+def get_conversation_by_id_str_route(
+    conversation_id_str: str,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ) -> Any:
     """
-    Get a specific conversation by UUID with all messages.
+    Get a specific conversation by conversation_id with all messages.
     """
-    conversation = get_conversation_by_uuid(db, conversation_uuid)
+    conversation = get_conversation_by_id_str(db, conversation_id_str)
     if not conversation:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Conversation not found")
 
@@ -106,12 +107,12 @@ def get_conversation_by_uuid_route(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not enough permissions")
 
     # Get messages for this conversation
-    messages = get_conversation_messages(db, conversation.id)
+    messages = get_conversation_messages(db, conversation.conversation_id)
 
     # Create a ConversationWithMessages object
     result = ConversationWithMessages(
         id=conversation.id,
-        uuid=conversation.uuid,
+        conversation_id=conversation.conversation_id,
         user_id=conversation.user_id,
         title=conversation.title,
         created_at=conversation.created_at,
@@ -121,7 +122,7 @@ def get_conversation_by_uuid_route(
 
     return result
 
-# Update conversation title
+# Update conversation title by ID
 @router.put("/conversations/{conversation_id}", response_model=Conversation)
 def update_conversation(
     conversation_id: int,
@@ -130,7 +131,7 @@ def update_conversation(
     current_user: User = Depends(get_current_user)
 ) -> Any:
     """
-    Update conversation title.
+    Update conversation title by ID.
     """
     conversation = get_conversation_by_id(db, conversation_id)
     if not conversation:
@@ -142,7 +143,28 @@ def update_conversation(
     updated_conversation = update_conversation_title(db, conversation_id, title)
     return updated_conversation
 
-# Delete a conversation
+# Update conversation title by conversation_id (UUID)
+@router.put("/conversations/id/{conversation_id_str}", response_model=Conversation)
+def update_conversation_by_id_str(
+    conversation_id_str: str,
+    title: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+) -> Any:
+    """
+    Update conversation title by conversation_id (UUID).
+    """
+    conversation = get_conversation_by_id_str(db, conversation_id_str)
+    if not conversation:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Conversation not found")
+
+    if conversation.user_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not enough permissions")
+
+    updated_conversation = update_conversation_title(db, conversation.conversation_id, title)
+    return updated_conversation
+
+# Delete a conversation by ID
 @router.delete("/conversations/{conversation_id}")
 def delete_conversation_route(
     conversation_id: int,
@@ -150,7 +172,7 @@ def delete_conversation_route(
     current_user: User = Depends(get_current_user)
 ) -> Any:
     """
-    Delete a conversation.
+    Delete a conversation by ID.
     """
     conversation = get_conversation_by_id(db, conversation_id)
     if not conversation:
@@ -162,8 +184,33 @@ def delete_conversation_route(
     delete_conversation(db, conversation_id)
     return {"status": "success", "message": "Conversation deleted"}
 
+# Delete a conversation by conversation_id (UUID)
+@router.delete("/conversations/id/{conversation_id_str}")
+def delete_conversation_by_id_str_route(
+    conversation_id_str: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+) -> Any:
+    """
+    Delete a conversation by conversation_id (UUID).
+    """
+    conversation = get_conversation_by_id_str(db, conversation_id_str)
+    if not conversation:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Conversation not found")
+
+    if conversation.user_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not enough permissions")
+
+    delete_conversation(db, conversation.conversation_id)
+    return {"status": "success", "message": "Conversation deleted"}
+
+# Custom response model for chat API
+class ChatResponse(BaseModel):
+    messages: List[Message]
+    conversation: Conversation
+
 # Send a message and get AI response
-@router.post("/chat", response_model=List[Message])
+@router.post("/chat", response_model=ChatResponse)
 def chat(
     message_in: MessageCreate,
     db: Session = Depends(get_db),
@@ -173,38 +220,35 @@ def chat(
     Send a message and get AI response.
     """
     # Determine the conversation
-    conversation_id = None
-    if message_in.conversation_id:
-        conversation = get_conversation_by_id(db, message_in.conversation_id)
-        if not conversation:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Conversation not found")
+    conversation = None
+    conversation_id_str = message_in.conversation_id
 
-        if conversation.user_id != current_user.id:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not enough permissions")
-
-        conversation_id = conversation.id
-    elif message_in.conversation_uuid:
-        conversation = get_conversation_by_uuid(db, message_in.conversation_uuid)
+    if conversation_id_str:
+        # Try to get existing conversation by UUID
+        conversation = get_conversation_by_id_str(db, conversation_id_str)
         if not conversation:
-            # Create a new conversation if it doesn't exist
-            new_conversation = ConversationCreate(title="New Conversation")
+            # If not found, create a new conversation
+            # Use the first part of the message as the title (up to 50 chars)
+            title = message_in.content[:50] + ("..." if len(message_in.content) > 50 else "")
+            new_conversation = ConversationCreate(title=title)
             conversation = create_conversation(db, new_conversation, current_user.id)
-
-        if conversation.user_id != current_user.id:
+            conversation_id_str = conversation.conversation_id
+        elif conversation.user_id != current_user.id:
+            # Check permissions
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not enough permissions")
-
-        conversation_id = conversation.id
     else:
         # Create a new conversation
-        new_conversation = ConversationCreate(title="New Conversation")
+        # Use the first part of the message as the title (up to 50 chars)
+        title = message_in.content[:50] + ("..." if len(message_in.content) > 50 else "")
+        new_conversation = ConversationCreate(title=title)
         conversation = create_conversation(db, new_conversation, current_user.id)
-        conversation_id = conversation.id
+        conversation_id_str = conversation.conversation_id
 
     # Ensure the role is 'user'
     message_in.role = "user"
 
     # Save the user message
-    user_message = create_message(db, message_in, conversation_id)
+    user_message = create_message(db, message_in, conversation_id_str)
 
     # Generate AI response
     ai_response_text = generate_ai_response(message_in.content)
@@ -212,10 +256,12 @@ def chat(
     # Create AI response message
     ai_message_in = MessageCreate(
         role="assistant",
-        content=ai_response_text,
-        conversation_id=conversation_id
+        content=ai_response_text
     )
-    ai_message = create_message(db, ai_message_in, conversation_id)
+    ai_message = create_message(db, ai_message_in, conversation_id_str)
 
-    # Return both messages
-    return [user_message, ai_message]
+    # Return messages and conversation details
+    return {
+        "messages": [user_message, ai_message],
+        "conversation": conversation
+    }

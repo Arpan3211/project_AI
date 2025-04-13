@@ -226,11 +226,11 @@ export const chatApi = {
 
     /**
      * Get a specific conversation with messages
-     * @param {number} conversationId - Conversation ID
+     * @param {string} conversationId - Conversation ID (UUID string)
      * @returns {Promise} - Conversation data with messages
      */
     getConversation: async (conversationId) => {
-        return await apiService.get(`/conversations/${conversationId}`);
+        return await apiService.get(`/conversations/id/${conversationId}`);
     },
 
     /**
@@ -245,8 +245,8 @@ export const chatApi = {
     /**
      * Send a message and get AI response
      * @param {string} message - User message
-     * @param {number|null} conversationId - Conversation ID (optional)
-     * @returns {Promise} - Message response data
+     * @param {string|null} conversationId - Conversation ID (UUID string, optional)
+     * @returns {Promise} - Object containing messages and conversation details
      */
     sendMessage: async (message, conversationId = null) => {
         const payload = {
@@ -258,25 +258,29 @@ export const chatApi = {
             payload.conversation_id = conversationId;
         }
 
-        return await apiService.post('/chat', payload);
+        const response = await apiService.post('/chat', payload);
+        return {
+            messages: response.messages,
+            conversation: response.conversation
+        };
     },
 
     /**
      * Delete a conversation
-     * @param {number} conversationId - Conversation ID
+     * @param {string} conversationId - Conversation ID (UUID string)
      * @returns {Promise} - Delete confirmation
      */
     deleteConversation: async (conversationId) => {
-        return await apiService.delete(`/conversations/${conversationId}`);
+        return await apiService.delete(`/conversations/id/${conversationId}`);
     },
 
     /**
      * Update conversation title
-     * @param {number} conversationId - Conversation ID
+     * @param {string} conversationId - Conversation ID (UUID string)
      * @param {string} title - New title
      * @returns {Promise} - Updated conversation data
      */
     updateConversationTitle: async (conversationId, title) => {
-        return await apiService.put(`/conversations/${conversationId}?title=${encodeURIComponent(title)}`);
+        return await apiService.put(`/conversations/id/${conversationId}?title=${encodeURIComponent(title)}`);
     }
 };

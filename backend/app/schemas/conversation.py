@@ -13,7 +13,7 @@ class ConversationCreate(ConversationBase):
 # Properties to return via API
 class Conversation(ConversationBase):
     id: int
-    uuid: str
+    conversation_id: str
     user_id: int
     created_at: datetime
     updated_at: Optional[datetime] = None

@@ -15,9 +15,9 @@ except ImportError:
     from backend.app.schemas.conversation import ConversationCreate
     from backend.app.schemas.message import MessageCreate
 
-# Get conversation by UUID
-def get_conversation_by_uuid(db: Session, uuid: str) -> Optional[Conversation]:
-    return db.query(Conversation).filter(Conversation.uuid == uuid).first()
+# Get conversation by conversation_id
+def get_conversation_by_id_str(db: Session, conversation_id: str) -> Optional[Conversation]:
+    return db.query(Conversation).filter(Conversation.conversation_id == conversation_id).first()
 
 # Get conversation by ID
 def get_conversation_by_id(db: Session, conversation_id: int) -> Optional[Conversation]:
@@ -43,7 +43,7 @@ def update_conversation_title(db: Session, conversation_id: int, title: str) -> 
     db_conversation = get_conversation_by_id(db, conversation_id)
     if not db_conversation:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Conversation not found")
-    
+
     db_conversation.title = title
     db.commit()
     db.refresh(db_conversation)
@@ -54,7 +54,7 @@ def delete_conversation(db: Session, conversation_id: int) -> bool:
     db_conversation = get_conversation_by_id(db, conversation_id)
     if not db_conversation:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Conversation not found")
-    
+
     db.delete(db_conversation)
     db.commit()
     return True
@@ -64,22 +64,21 @@ def get_conversation_messages(db: Session, conversation_id: int) -> List[Message
     return db.query(Message).filter(Message.conversation_id == conversation_id).order_by(Message.created_at).all()
 
 # Create a new message
-def create_message(db: Session, message_in: MessageCreate, conversation_id: int = None) -> Message:
-    # If conversation_uuid is provided, get the conversation_id
-    if not conversation_id and message_in.conversation_uuid:
-        conversation = get_conversation_by_uuid(db, message_in.conversation_uuid)
-        if not conversation:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Conversation not found")
-        conversation_id = conversation.id
-    
-    # Use the provided conversation_id or the one from conversation_uuid
-    if not conversation_id and not message_in.conversation_id:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Conversation ID or UUID is required")
-    
-    final_conversation_id = conversation_id or message_in.conversation_id
-    
+def create_message(db: Session, message_in: MessageCreate, conversation_id_str: str = None) -> Message:
+    # Get the conversation by UUID
+    conversation_uuid = conversation_id_str or message_in.conversation_id
+
+    if not conversation_uuid:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Conversation ID is required")
+
+    # Get the conversation to ensure it exists and to get its numeric ID
+    conversation = get_conversation_by_id_str(db, conversation_uuid)
+    if not conversation:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Conversation not found")
+
+    # Use the numeric ID for the database relationship
     db_message = Message(
-        conversation_id=final_conversation_id,
+        conversation_id= conversation_id_str,  # Use the numeric ID for the database relationship
         role=message_in.role,
         content=message_in.content
     )
@@ -92,7 +91,7 @@ def create_message(db: Session, message_in: MessageCreate, conversation_id: int 
 def generate_ai_response(prompt: str) -> str:
     # This is a simple demo response generator
     # In a real application, this would call an AI model API
-    
+
     responses = [
         f"I understand you're saying: '{prompt}'. That's an interesting point.",
         f"Thanks for sharing your thoughts on '{prompt}'. I'd like to learn more.",
@@ -103,5 +102,5 @@ def generate_ai_response(prompt: str) -> str:
         f"I've analyzed your input on '{prompt}' and have some thoughts to share.",
         f"Based on your message about '{prompt}', I can provide the following information."
     ]
-    
+
     return random.choice(responses)

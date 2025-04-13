@@ -9,15 +9,14 @@ class MessageBase(BaseModel):
 
 # Properties to receive via API on creation
 class MessageCreate(MessageBase):
-    conversation_id: Optional[int] = None
-    conversation_uuid: Optional[str] = None
+    conversation_id: Optional[str] = None  # UUID string
 
 # Properties to return via API
 class Message(MessageBase):
     id: int
-    uuid: str
-    conversation_id: int
+    message_id: str
+    conversation_id: str
     created_at: datetime
-    
+
     class Config:
         orm_mode = True

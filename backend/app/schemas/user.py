@@ -32,7 +32,7 @@ class UserLogin(BaseModel):
 # Properties to return via API
 class User(UserBase):
     id: int
-    uuid: str
+    user_id: str
     is_active: bool
     created_at: datetime
 

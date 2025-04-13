@@ -14,6 +14,9 @@ except ImportError:
 
 # Create tables
 def init_db():
+    # Drop all tables first to ensure clean schema
+    Base.metadata.drop_all(bind=engine)
+    # Create all tables with new schema
     Base.metadata.create_all(bind=engine)
 
     # You can add initial data here if needed
